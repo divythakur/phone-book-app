@@ -19,6 +19,6 @@
     transform: rotate(-135deg);
     -webkit-transform: rotate(-135deg);
   }
-  #3{
+  .hidden{
     display:none;
   }
