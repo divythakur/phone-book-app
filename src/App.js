@@ -1,33 +1,62 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
+import React from 'react';
 import './App.css';
-import Addsubscriber from './Addsubscriber'
-import Details from './Details';
+import {Grid} from '@material-ui/core';
+import youtube from "./api/youtube";
+import SearchBar from "./Component/SearchBar";
+import VideoDetail from "./Component/VideoDetail";
+import VideoList from "./Component/VideoList";
 
-class App extends Component {
+class App extends React.Component {
 
-  state = {
-    consumerdetails:[
-      { id: "1", name: "rahul", phone: "78957487547", email: "abc@werty.com" },
-      { id: 2, name: "mohit", phone: "5455454444", email: "art@kj.com" },
-      { id: 3, name: "RAm", phone: "5455204444", email: "ythj@kj.com" }
-    ]
-  }
- 
-  addperson=(info)=>{
-      let i=[...this.state.consumerdetails,info];
-      this.setState({consumerdetails:i});
+    state={
+        videos:[],
+        selectedVideo:null
+    };
 
-  }
-  render() {
-    return (
-      <div>
-       <Details details={this.state.consumerdetails}></Details>
-       <Addsubscriber addPerson={this.addperson} />
+    componentDidMount() {
+        this.handleSubmit('latest');
+    }
 
-      </div>
-    );
-  }
+    handleSubmit = async (searchItem) => {
+        const response = await youtube.get('search', {params:{
+                part:'snippet',
+                maxResults:5,
+                key:'AIzaSyDsrbe1ycyG6NbujJFokmlQkEr3gvaeMgE',
+                q:searchItem
+            }});
+
+        console.log(response.data.items);
+        this.setState({
+            videos:response.data.items,
+            selectedVideo:response.data.items[0]
+        });
+    };
+
+    onVideoSelect = (video) =>{
+        this.setState({
+            selectedVideo:video
+        });
+    };
+
+    render() {
+        return (
+            <Grid justigy="center" container spacing={10}>
+                <Grid item xs={12}>
+                    <Grid container spacing={10}>
+                        <Grid item xs={12}>
+                            <SearchBar onFormSubmit={this.handleSubmit}/>
+                        </Grid>
+                        <Grid item xs={8}>
+                            <VideoDetail video={this.state.selectedVideo} />
+                        </Grid>
+                        <Grid item xs={4}>
+                            <VideoList videos={this.state.videos} onVideoSelect={this.onVideoSelect} />
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Grid>
+        )
+    }
 }
 
 export default App;
